@@ -1,0 +1,380 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Sahayak - AI Teaching Companion</title>
+    <style>
+        /* --- Enhanced Styles --- */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 2em; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 2em; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h1 { font-size: 2.5em; color: #1a1a1a; text-align: center; }
+        h2 { font-size: 1.8em; color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 0.3em; margin-top: 1.5em; }
+        p { line-height: 1.6; }
+        button { background-color: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500; transition: background-color 0.2s, transform 0.1s; }
+        button:hover { background-color: #45a049; }
+        button:active { transform: scale(0.98); }
+        button:disabled { background-color: #9E9E9E; cursor: not-allowed; }
+
+        /* The Loader Spinner */
+        .loader {
+            display: none; /* Hidden by default */
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4CAF50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* The Output Card Style */
+        .results-card {
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            padding: 1.5em;
+            margin-top: 1.5em;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .results-card h3 { margin-top: 0; }
+        .results-card pre { white-space: pre-wrap; font-family: inherit; font-size: 16px; line-height: 1.7; }
+    </style>
+</head>
+<body>
+
+    <h1>TESTING... DOES THIS HEADING APPEAR?</h1>
+
+    <div class="container">
+        <h1>Project Sahayak 🇮🇳</h1>
+        <p>Your AI-powered companion for the multi-grade classroom.</p>
+
+        <hr>
+
+        <h2>1. Generate Differentiated Worksheets</h2>
+        <p>Upload a photo of a textbook page to instantly create worksheets for different grades.</p>
+        
+        <input type="file" id="image-input" accept="image/*">
+        <button id="generate-btn">Generate Worksheets</button>
+
+        <div class="loader" id="loader"></div>
+
+        <div id="results-container" class="results">
+            </div>
+    </div>
+
+    <hr style="margin-top: 2em;">
+
+        <h2>2. Generate Hyper-Local Content</h2>
+        <p>Ask for a story or an explanation on any topic in your local language.</p>
+
+        <textarea id="story-prompt" rows="3" placeholder="e.g., Create a story about farming to explain different soil types" style="width: 98%; font-size: 16px; padding: 1%;"></textarea>
+        <button id="story-btn" style="margin-top: 1em;">Generate Story</button>
+
+        <div id="story-results" class="results">
+            </div>
+
+
+    <hr style="margin-top: 2em;">
+
+        <h2>3. AI-Powered Lesson Planner</h2>
+        <p>Enter a topic and duration to get a structured lesson plan for your class.</p>
+
+        <div style="margin-bottom: 1em;">
+            <label for="plan-topic">Topic:</label>
+            <input type="text" id="plan-topic" placeholder="e.g., The Mughal Empire" style="width: 300px; padding: 5px;">
+        </div>
+        <div style="margin-bottom: 1em;">
+            <label for="plan-duration">Duration:</label>
+            <input type="text" id="plan-duration" placeholder="e.g., 1 Week" style="width: 200px; padding: 5px;">
+        </div>
+        
+        <button id="plan-btn">Generate Lesson Plan</button>
+
+        <div id="plan-results" class="results">
+            </div>
+
+    
+
+
+
+    <script>
+        // === CONSOLIDATED & CORRECTED SCRIPT ===
+
+    // 1. DEFINE ALL HTML ELEMENTS FIRST
+    // This ensures all variables are initialized before they are used.
+
+    // --- Worksheet Generator Elements ---
+    const generateBtn = document.getElementById('generate-btn');
+    const imageInput = document.getElementById('image-input');
+    const resultsContainer = document.getElementById('results-container');
+    const loader = document.getElementById('loader');
+
+    // --- Story Generator Elements ---
+    const storyBtn = document.getElementById('story-btn');
+    const storyPrompt = document.getElementById('story-prompt');
+    const storyResults = document.getElementById('story-results');
+
+    // --- Lesson Planner Elements ---
+    const planBtn = document.getElementById('plan-btn');
+    const planTopic = document.getElementById('plan-topic');
+    const planDuration = document.getElementById('plan-duration');
+    const planResults = document.getElementById('plan-results');
+
+
+    // 2. ADD ALL EVENT LISTENERS
+
+    // --- Worksheet Generator Listener ---
+    generateBtn.addEventListener('click', async () => {
+        const file = imageInput.files[0];
+        if (!file) { alert("Please select an image file first."); return; }
+
+        loader.style.display = 'block';
+        resultsContainer.innerHTML = '';
+        generateBtn.disabled = true;
+        generateBtn.textContent = 'Generating...';
+
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            const response = await fetch('YOUR_NGROK_URL/generate_worksheets', { method: 'POST', body: formData });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            resultsContainer.innerHTML = `<div class="results-card"><h3>Generated Worksheets:</h3><h4>For Grade 3</h4><p>${data.grade3}</p><hr><h4>For Grade 5</h4><p>${data.grade5}</p><hr><h4>For Grade 7</h4><p>${data.grade7}</p></div>`;
+        } catch (error) {
+            resultsContainer.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+        } finally {
+            loader.style.display = 'none';
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'Generate Worksheets';
+        }
+    });
+
+    // --- Story Generator Listener ---
+    storyBtn.addEventListener('click', async () => {
+        const promptText = storyPrompt.value;
+        if (!promptText) { alert("Please enter a topic for the story."); return; }
+
+        storyResults.innerHTML = '';
+        storyBtn.disabled = true;
+        storyBtn.textContent = 'Generating...';
+        try {
+            const response = await fetch('YOUR_NGROK_URL/generate_story', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: promptText }) });
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            storyResults.innerHTML = `<div class="results-card"><h3>Generated Content:</h3><pre>${data.story}</pre></div>`;
+        } catch (error) {
+            storyResults.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+        } finally {
+            storyBtn.disabled = false;
+            storyBtn.textContent = 'Generate Story';
+        }
+    });
+
+    // --- Lesson Planner Listener ---
+    planBtn.addEventListener('click', async () => {
+        const topicValue = planTopic.value;
+        const durationValue = planDuration.value;
+        if (!topicValue || !durationValue) { alert("Please enter both a topic and a duration."); return; }
+
+        planResults.innerHTML = '';
+        planBtn.disabled = true;
+        planBtn.textContent = 'Generating...';
+        try {
+            const response = await fetch('YOUR_NGROK_URL/generate_plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: topicValue, duration: durationValue }) });
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            planResults.innerHTML = `<div class="results-card"><h3>Your Lesson Plan:</h3><pre>${data.plan}</pre></div>`;
+        } catch (error) {
+            planResults.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+        } finally {
+            planBtn.disabled = false;
+            planBtn.textContent = 'Generate Lesson Plan';
+        }
+    });
+
+
+        // --- End of JavaScript code ---
+    </script>
+
+</body>
+</html>
+
+ -->
+
+
+
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Sahayak - AI Teaching Companion</title>
+    <style>
+        /* --- Enhanced Styles --- */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 2em; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 2em; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h1 { font-size: 2.5em; color: #1a1a1a; text-align: center; }
+        h2 { font-size: 1.8em; color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 0.3em; margin-top: 1.5em; }
+        p, label { line-height: 1.6; }
+        button { background-color: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500; transition: background-color 0.2s, transform 0.1s; }
+        button:hover { background-color: #45a049; }
+        button:active { transform: scale(0.98); }
+        button:disabled { background-color: #9E9E9E; cursor: not-allowed; }
+
+        /* The Loader Spinner */
+        .loader {
+            display: none; /* Hidden by default */
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4CAF50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* The Output Card Style */
+        .results-card {
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            padding: 1.5em;
+            margin-top: 1.5em;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .results-card h3 { margin-top: 0; }
+        .results-card pre { white-space: pre-wrap; font-family: inherit; font-size: 16px; line-height: 1.7; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Project Sahayak 🇮🇳</h1>
+        <p>Your AI-powered companion for the multi-grade classroom.</p>
+        <div class="loader" id="loader"></div>
+
+        <hr>
+
+        <h2>1. Generate Differentiated Worksheets</h2>
+        <p>Upload a photo of a textbook page to instantly create worksheets for different grades.</p>
+        <input type="file" id="image-input" accept="image/*">
+        <button id="generate-btn">Generate Worksheets</button>
+        <div id="results-container" class="results"></div>
+
+        <hr style="margin-top: 2em;">
+
+        <h2>2. Generate Hyper-Local Content</h2>
+        <p>Ask for a story or an explanation on any topic in your local language.</p>
+        <textarea id="story-prompt" rows="3" placeholder="e.g., Create a story about farming to explain different soil types" style="width: 98%; font-size: 16px; padding: 1%;"></textarea>
+        <button id="story-btn" style="margin-top: 1em;">Generate Story</button>
+        <div id="story-results" class="results"></div>
+        
+        <hr style="margin-top: 2em;">
+
+        <h2>3. AI-Powered Lesson Planner</h2>
+        <p>Enter a topic and duration to get a structured lesson plan for your class.</p>
+        <div style="margin-bottom: 1em;">
+            <label for="plan-topic">Topic:</label>
+            <input type="text" id="plan-topic" placeholder="e.g., The Mughal Empire" style="width: 300px; padding: 5px;">
+        </div>
+        <div style="margin-bottom: 1em;">
+            <label for="plan-duration">Duration:</label>
+            <input type="text" id="plan-duration" placeholder="e.g., 1 Week" style="width: 200px; padding: 5px;">
+        </div>
+        <button id="plan-btn">Generate Lesson Plan</button>
+        <div id="plan-results" class="results"></div>
+
+    </div>
+
+    <script>
+    // === CONSOLIDATED & CORRECTED SCRIPT ===
+
+    // 1. DEFINE ALL HTML ELEMENTS FIRST
+    const generateBtn = document.getElementById('generate-btn');
+    const imageInput = document.getElementById('image-input');
+    const resultsContainer = document.getElementById('results-container');
+    const loader = document.getElementById('loader');
+    const storyBtn = document.getElementById('story-btn');
+    const storyPrompt = document.getElementById('story-prompt');
+    const storyResults = document.getElementById('story-results');
+    const planBtn = document.getElementById('plan-btn');
+    const planTopic = document.getElementById('plan-topic');
+    const planDuration = document.getElementById('plan-duration');
+    const planResults = document.getElementById('plan-results');
+
+    // 2. ADD ALL EVENT LISTENERS
+    generateBtn.addEventListener('click', async () => {
+        const file = imageInput.files[0];
+        if (!file) { alert("Please select an image file first."); return; }
+        loader.style.display = 'block';
+        resultsContainer.innerHTML = '';
+        generateBtn.disabled = true;
+        generateBtn.textContent = 'Generating...';
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            const response = await fetch('YOUR_NGROK_URL/generate_worksheets', { method: 'POST', body: formData });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            resultsContainer.innerHTML = `<div class="results-card"><h3>Generated Worksheets:</h3><h4>For Grade 3</h4><p>${data.grade3}</p><hr><h4>For Grade 5</h4><p>${data.grade5}</p><hr><h4>For Grade 7</h4><p>${data.grade7}</p></div>`;
+        } catch (error) {
+            resultsContainer.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+        } finally {
+            loader.style.display = 'none';
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'Generate Worksheets';
+        }
+    });
+
+    storyBtn.addEventListener('click', async () => {
+        const promptText = storyPrompt.value;
+        if (!promptText) { alert("Please enter a topic for the story."); return; }
+        storyResults.innerHTML = '';
+        storyBtn.disabled = true;
+        storyBtn.textContent = 'Generating...';
+        try {
+            const response = await fetch('YOUR_NGROK_URL/generate_story', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: promptText }) });
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            storyResults.innerHTML = `<div class="results-card"><h3>Generated Content:</h3><pre>${data.story}</pre></div>`;
+        } catch (error) {
+            storyResults.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+        } finally {
+            storyBtn.disabled = false;
+            storyBtn.textContent = 'Generate Story';
+        }
+    });
+
+    planBtn.addEventListener('click', async () => {
+        const topicValue = planTopic.value;
+        const durationValue = planDuration.value;
+        if (!topicValue || !durationValue) { alert("Please enter both a topic and a duration."); return; }
+        planResults.innerHTML = '';
+        planBtn.disabled = true;
+        planBtn.textContent = 'Generating...';
+        try {
+            const response = await fetch('YOUR_NGROK_URL/generate_plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: topicValue, duration: durationValue }) });
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            planResults.innerHTML = `<div class="results-card"><h3>Your Lesson Plan:</h3><pre>${data.plan}</pre></div>`;
+        } catch (error) {
+            planResults.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+        } finally {
+            planBtn.disabled = false;
+            planBtn.textContent = 'Generate Lesson Plan';
+        }
+    });
+    </script>
+</body>
+</html>
+
