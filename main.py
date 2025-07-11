@@ -9,7 +9,7 @@
 # # --- Configure the Gemini API with your key ---
 # # It's best practice to set this as an environment variable,
 # # but for speed tonight, you can paste it directly.
-# YOUR_API_KEY = "AIzaSyBs3sfIvPppnhcYn7TBCWAXzOCG0Y8BEfs"
+# YOUR_API_KEY = ""
 # genai.configure(api_key=YOUR_API_KEY)
 
 # # Configure the Gemini Model
