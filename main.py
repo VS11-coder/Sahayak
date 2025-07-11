@@ -88,6 +88,7 @@ from flask_cors import CORS
 import google.generativeai as genai
 from PIL import Image
 import os # We'll use os to get the key safely
+import .env  # This is to load environment variables from a .env file
 
 app = Flask(__name__)
 CORS(app)
@@ -100,7 +101,7 @@ try:
     # genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 
     # QUICK HACKATHON FIX (Use your NEW key, not the old one):
-    genai.configure(api_key="AIzaSyDttMk51PjA4YUJJ-jd5Wz23aaX01Yxjjw")
+    genai.configure(api_key=API_KEY)
 
 except AttributeError:
     print("ERROR: GOOGLE_API_KEY environment variable not set.")
@@ -204,3 +205,6 @@ def generate_plan():
 # This starts the server when you run "python main.py"
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
+
+

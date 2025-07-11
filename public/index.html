@@ -215,6 +215,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Sahayak - AI Teaching Companion</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js" integrity="sha512-gR3vImI+ehB_2/MLmxULeUgnIUNVv0sSHM9Gz7EDFnndBv3/s52iI+sc2eJ1lI61msiR5M+s1O3L45kLzP+0MA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         /* --- Enhanced Styles --- */
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 2em; }
@@ -312,30 +313,77 @@
     const planDuration = document.getElementById('plan-duration');
     const planResults = document.getElementById('plan-results');
 
-    // 2. ADD ALL EVENT LISTENERS
-    generateBtn.addEventListener('click', async () => {
+
+    // --- Updated JavaScript with Image Compression ---
+    
+        // --- DEBUGGING VERSION for Worksheet Generator ---
+
+    generateBtn.addEventListener('click', () => {
+        console.log("1. 'Generate Worksheets' button clicked!");
+
         const file = imageInput.files[0];
-        if (!file) { alert("Please select an image file first."); return; }
+        if (!file) {
+            alert("Please select an image file first.");
+            return;
+        }
+        console.log("2. File selected:", file.name);
+
+        const options = {
+            quality: 0.6,
+            maxWidth: 1024,
+            maxHeight: 1024,
+            success(compressedFile) {
+                console.log("4. Image compression was successful!", compressedFile);
+                uploadFile(compressedFile);
+            },
+            error(err) {
+            // This will show us if the compressor itself is failing
+                console.error("COMPRESSOR FAILED:", err.message);
+                alert('Image compression failed: ' + err.message);
+            },
+        };
+
+        console.log("3. Initializing the image compressor...");
+        new Compressor(file, options);
+    });
+
+    async function uploadFile(file) {
+        console.log("5. Inside uploadFile function, preparing to fetch.");
+
         loader.style.display = 'block';
         resultsContainer.innerHTML = '';
         generateBtn.disabled = true;
         generateBtn.textContent = 'Generating...';
+
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', file, file.name);
+
         try {
-            const response = await fetch('YOUR_NGROK_URL/generate_worksheets', { method: 'POST', body: formData });
+            console.log("6. Sending the request to the server...");
+            const response = await fetch('https://sahayak-backend-6od8.onrender.com/generate_worksheets', { // Make sure this is your Render URL
+                method: 'POST',
+                body: formData
+            });
+            console.log("7. Received a response from the server.");
+
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
             const data = await response.json();
             resultsContainer.innerHTML = `<div class="results-card"><h3>Generated Worksheets:</h3><h4>For Grade 3</h4><p>${data.grade3}</p><hr><h4>For Grade 5</h4><p>${data.grade5}</p><hr><h4>For Grade 7</h4><p>${data.grade7}</p></div>`;
+
         } catch (error) {
+        // This will show us if the fetch itself is failing
+            console.error("FETCH FAILED:", error);
             resultsContainer.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
         } finally {
+            console.log("8. Process finished. Cleaning up UI.");
             loader.style.display = 'none';
             generateBtn.disabled = false;
             generateBtn.textContent = 'Generate Worksheets';
         }
-    });
-
+    }
+    
+    
     storyBtn.addEventListener('click', async () => {
         const promptText = storyPrompt.value;
         if (!promptText) { alert("Please enter a topic for the story."); return; }
@@ -343,7 +391,7 @@
         storyBtn.disabled = true;
         storyBtn.textContent = 'Generating...';
         try {
-            const response = await fetch('YOUR_NGROK_URL/generate_story', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: promptText }) });
+            const response = await fetch('https://sahayak-backend-6od8.onrender.com/generate_story', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: promptText }) });
             const data = await response.json();
             if (data.error) throw new Error(data.error);
             storyResults.innerHTML = `<div class="results-card"><h3>Generated Content:</h3><pre>${data.story}</pre></div>`;
@@ -363,7 +411,7 @@
         planBtn.disabled = true;
         planBtn.textContent = 'Generating...';
         try {
-            const response = await fetch('YOUR_NGROK_URL/generate_plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: topicValue, duration: durationValue }) });
+            const response = await fetch('https://sahayak-backend-6od8.onrender.com/generate_plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: topicValue, duration: durationValue }) });
             const data = await response.json();
             if (data.error) throw new Error(data.error);
             planResults.innerHTML = `<div class="results-card"><h3>Your Lesson Plan:</h3><pre>${data.plan}</pre></div>`;
@@ -377,4 +425,3 @@
     </script>
 </body>
 </html>
-
